@@ -1,7 +1,3 @@
-
---[[ НАЧАЛО ОБЪЯВЛЕНИЯ ФУНКЦИЙ LUA ]]--
-
-
 -- Функция для сравнения двух таблиц
 function tablesEqual(table1, table2)
     if #table1 ~= #table2 then
@@ -33,11 +29,6 @@ function checkCoordinatesEquality(x_current, y_current, z_current, x_needed, y_n
     return false
 end
 
---[[ КОНЕЦ ОБЪЯВЛЕНИЯ ФУНКЦИЙ LUA ]]--
-
-
---[[ НАЧАЛО ОБЪЯВЛЕНИЙ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ ]]--
-
 local globalDialogForNPC1 = {""}
 local globalDialogForNPC2 = {""}
 local answerValue
@@ -46,11 +37,6 @@ previousDialogName = ""
 -- первоначальная позиция-триггер
 local neededPosition = { 4.0, 0.0, 10.0 }
 local currentStage = 0 -- Переменная для отслеживания текущего этапа
-
---[[ КОНЕЦ ОБЪЯВЛЕНИЯ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ]]--
-
-
---[[ НАЧАЛО СИСТЕМНЫХ ФУНКЦИЙ ДВИЖКА ]]--
 
 -- loadMusic и loadMusicExternal. Первый грузит из res/data.bin, второй откуда скажете в файловой системе.
 loadMusicExternal("./res/silent.mp3")
@@ -101,12 +87,28 @@ function _2dEventLoopCoroutine()
         end
         if currentStage == 2 then
             hideHint()
-            showHint("Picked up a \"Old key.\"")
+            showHint("Picked up an \"Old key.\"")
             startTime = getTime()
             while getTime() - startTime < 2.0 do
                 coroutine.yield() -- Wait for 2 seconds
             end
             hideHint()
+            currentStage = 3
+        end
+        if currentStage == 3 then
+            stopMusic()
+            draw2Dtexture(0)
+            startTime = getTime()
+            while getTime() - startTime < 2.0 do
+                coroutine.yield() -- Wait for 2 seconds
+            end
+            reloadShaderFragment("res/normal_shader.fs")
+            reloadShaderVertex("res/normal_shader.vs")
+            loadScene("res/scene2.json")
+            loadMusicExternal("res/heavens_night.mp3")
+            playMusic()
+            stopDraw2Dtexture()
+            allowControl()
         end
     end)
 end
@@ -134,11 +136,6 @@ function _2dEventLoop()
     end
 end
 
---[[ КОНЕЦ СИСТЕМНЫХ ФУНКЦИЙ ДВИЖКА ]]--
-
-
---[[ НАЧАЛО ФУНКЦИЙ ОБЪЯВЛЕНИЯ ОСНОВНЫХ КОМПОНЕНТОВ ]]--
-
 -- Установка безопасной зоны
 setFriendlyZone(1) -- 1 - дружелюбно, 0 - враждебно, т.е появляются случайные встречи с врагами
 -- Установка модели игрока
@@ -161,9 +158,9 @@ drawPlayerModel(1);
 -- adding objects to inventory
 configureInventoryTabs({"Items", "System"})
 addToInventoryTab("Exit game", 1)
+reloadShaderVertex("./res/normal_shader.vs")
+reloadShaderFragment("./res/fog_shader.fs")
 loadScene("res/scene1.json")
-fogSwitcher(1)
+animationsState(1)
 -- инициализация событий
 _2dEventLoopCoroutine()
-
---[[ КОНЕЦ ФУНКЦИЙ ОБЪЯВЛЕНИЯ ОСНОВНЫХ КОМПОНЕНТОВ ]]--

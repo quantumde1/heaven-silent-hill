@@ -21,6 +21,21 @@
                 "z": 5
             },
             "rotationAngle": 0
+        },
+        {
+            "name": "light1",
+            "type": "light",
+            "position": {
+                "x": 0,
+                "y": 10,
+                "z": 0
+            },
+            "color": {
+                "r": 84,
+                "g": 124,
+                "b": 191,
+                "a": 0
+            }
         }
     ],
     "environment": {
