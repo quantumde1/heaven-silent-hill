@@ -11,6 +11,37 @@ function tablesEqual(table1, table2)
     return true
 end
 
+local function loadLanguageTexts(lang)
+    local filename = "res/" .. lang .. "-text.txt"
+    local file = io.open(filename, "r")
+    if not file then
+        error("Could not open language file: " .. filename)
+    end
+    
+    local texts = {}
+    
+    for line in file:lines() do
+        -- Пропускаем пустые строки
+        if line:match("%S") then
+            local id, textTableStr = line:match("#(%d+):%s*(%b{})")
+            if id and textTableStr then
+                local chunk = load("return " .. textTableStr)
+                if chunk then
+                    texts[tonumber(id)] = chunk()
+                else
+                    error("Failed to parse text table for ID " .. id)
+                end
+            end
+        end
+    end
+    
+    file:close()
+    return texts
+end
+
+lang = getLanguage();
+texts = loadLanguageTexts(lang)
+
 function checkCoordinatesEquality(x_current, y_current, z_current, x_needed, y_needed, z_needed)
     local deviation = 4
     if (x_current >= x_needed - deviation and x_current <= x_needed + deviation) then
@@ -100,23 +131,13 @@ function EventLoopCoroutine()
                 coroutine.yield()
             end
             
-            showHint("Where... where am I?...")
+            showHint(texts[1][1])
             startTime = getTime()
             while getTime() - startTime < 2.0 do
                 coroutine.yield()
             end
             hideHint()
-            
-            dialogBox("Announcer", {
-                "Our next story tonight concerns the upcoming virtual city, \"Paradigm X\"",
-                "While its public opening is coming soon, creator Algon Software is reportedly being flooded with beta applications.",
-                "The number of users is so great that the company is unable to shut down the site for new user registrations."
-            }, "news_reporter.png", -1, {""}, 0)
-            
-            while isDialogExecuted() do
-                coroutine.yield()
-            end
-            
+            showHint(texts[1][2])
             startTime = getTime()
             while getTime() - startTime < 2.0 do
                 coroutine.yield()
@@ -200,13 +221,22 @@ function EventLoopCoroutine()
 end
 
 function EventLoop()
+    if currentStage == 1 and checkCoordinatesEquality(getPlayerX(), getPlayerY(), getPlayerZ(), 0, 0, -10) == true then
+        showHint("Key is lying here.")
+        if isKeyPressed(getButtonName("dialog")) then
+            startTime = getTime()
+            currentStage = 2
+            addToInventoryTab("Old key", 0)
+            EventLoopCoroutine()
+        end
+    end
     updateSmoothCameraMove()
     if dialogCoroutine and coroutine.status(dialogCoroutine) ~= "dead" then
         coroutine.resume(dialogCoroutine)
     end
 end
 
-setFriendlyZone(0)
+setFriendlyZone(1)
 setPlayerModel("res/mc.glb", 1.0, 1.0, 1.0)
 setPlayerCollisionSize(3.0, 3.0, 3.0)
 setCameraRotationSpeed(1.16)
@@ -223,6 +253,9 @@ addToInventoryTab("Exit game", 1)
 reloadShaderFragment("res/fog_shader.fs")
 reloadShaderVertex("res/normal_shader.vs")
 loadScene("res/scene1.json")
-currentStage = 2
 animationsState(1)
+setFont("res/font.ttf")
+currentStage = 0
+addToInventoryTab("Old key", 0)
+addToInventoryTab("New key", 0)
 EventLoopCoroutine()
