@@ -149,7 +149,7 @@ function EventLoopCoroutine()
         
         if currentStage == 2 then
             hideHint()
-            showHint("Picked up an \"Old key.\"")
+            showHint(texts[2][1])
             startTime = getTime()
             while getTime() - startTime < 2.0 do
                 coroutine.yield()
@@ -176,7 +176,7 @@ function EventLoopCoroutine()
             startSmoothCameraMove(playerX-10.0, playerY+5.0, playerZ+5.0, 2.0)
             changeCameraTarget(0.0, 5.0, 0.0)
             hideHint()
-            showHint("Where am i...")
+            showHint(texts[3][1])
             while isCameraMoving do
                 rotateCamera(200.0, 54)
                 coroutine.yield()
@@ -198,13 +198,13 @@ function EventLoopCoroutine()
             while isCameraRotating() do
                 coroutine.yield()
             end
-            showHint("\"Heaven's night\", huh...")
+            showHint(texts[3][2])
             startTime = getTime()
             while getTime() - startTime < 3.0 do
                 coroutine.yield()
             end
             hideHint()
-            showHint("Is that... A some kind of brothel?...")
+            showHint(texts[3][3])
             startTime = getTime()
             while getTime() - startTime < 4.0 do
                 coroutine.yield()
@@ -222,7 +222,7 @@ end
 
 function EventLoop()
     if currentStage == 1 and checkCoordinatesEquality(getPlayerX(), getPlayerY(), getPlayerZ(), 0, 0, -10) == true then
-        showHint("Key is lying here.")
+        showHint(texts[2][2])
         if isKeyPressed(getButtonName("dialog")) then
             startTime = getTime()
             currentStage = 2

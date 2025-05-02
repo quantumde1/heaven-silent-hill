@@ -1,0 +1,3 @@
+#1: {"Where am I?...", "I need to look around. Maybe I'll find something useful..."}
+#2: {"Picked up an old key.", "Key is lying here."}
+#3: {"Where am I...", "\"Heaven's night\", huh...", "Is that... A some kind of brothel?..."}
